@@ -32,7 +32,8 @@
 				"humao.rest-client",
 				"ryu1kn.annotator",
 				"redhat.vscode-yaml",
-				"adrianwilczynski.namespace"
+				"adrianwilczynski.namespace",
+				"eamodio.gitlens"
 			]
 		}
 	}
