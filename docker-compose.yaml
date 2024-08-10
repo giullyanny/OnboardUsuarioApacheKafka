@@ -1,0 +1,87 @@
+version: "3"
+
+services: 
+  api-onboard-user-publisher:
+    container_name: api-onboard-user-publisher
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+      - 8080:8080
+      - 443:443
+      - 5269:5269
+    volumes:
+      - ./workspaces:/workspaces
+    networks:
+      - rede_local
+    depends_on:
+      - kafka
+      - mssql
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver2022
+    hostname: sqlserver2022
+    # restart: always
+    user: root
+    environment:
+      MSSQL_SA_PASSWORD: '1234'
+      ACCEPT_EULA: 'Y'
+      MSSQL_COLLATION: "SQL_Latin1_General_CP1_CI_AS"
+    ports:
+      - 2022:1433
+    volumes:
+      - /home/eduardo/_2022mssql/data:/var/opt/mssql/data
+      - /home/eduardo/_2022mssql/BKPs:/var/opt/mssql/BKPs
+    networks:
+      - rede_local
+
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - rede_local
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,OUTSIDE://host.docker.internal:9094
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - rede_local
+    depends_on:
+      - zookeeper
+
+  confluentinc:
+    container_name: confluentinc
+    image: confluentinc/cp-enterprise-control-center:latest
+    hostname: control-center
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:9092'
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_CONNECT_CLUSTER: http://kafka-connect:8083
+      PORT: 9021
+    networks:
+      - rede_local
+    depends_on:
+      - kafka
+
+networks:
+  rede_local:
+    external: true
+    driver: bridge

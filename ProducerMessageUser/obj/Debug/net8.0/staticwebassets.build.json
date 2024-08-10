@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "imSMVfTUjHQwficCwXODqSfGcGWJD8JU6r4KjYNJTjw=",
+  "Source": "ProducerMessageUser",
+  "BasePath": "_content/ProducerMessageUser",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
