@@ -3,6 +3,8 @@
 [Rr]elease/
 x64/
 x86/
+bin/
+obj/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
